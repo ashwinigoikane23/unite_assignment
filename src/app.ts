@@ -7,6 +7,9 @@ import leadsRoutes from "./routes/leads.route";
 import tasksRoutes from "./routes/tasks.route";
 import dotenv from "dotenv";
 import utilsRoutes from "./routes/utils.route";
+import YAML from "yamljs";
+import path from "path";
+import swaggerUi from "swagger-ui-express";
 
 dotenv.config();
 
@@ -17,6 +20,8 @@ export async function createApp() {
 
   const MONGO = process.env.MONGO_URI || "mongodb://localhost:27017/unite";
   await mongoose.connect(MONGO);
+  const swaggerDoc = YAML.load(path.join(__dirname, "../openapi.yaml"));
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
   app.use("/auth", authRoutes);
   app.use("/leads", leadsRoutes);
