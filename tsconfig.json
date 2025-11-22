@@ -11,6 +11,6 @@
     "outDir": "./dist",
     "rootDir": "."
   },
-  "include": ["src", "tests"],
+  "include": ["src", "frontend", "tests"],
   "exclude": ["node_modules", "dist"]
 }

@@ -6,6 +6,8 @@ import authRoutes from "./routes/auth.route";
 import leadsRoutes from "./routes/leads.route";
 import tasksRoutes from "./routes/tasks.route";
 import dotenv from "dotenv";
+import utilsRoutes from "./routes/utils.route";
+
 dotenv.config();
 
 export async function createApp() {
@@ -19,6 +21,7 @@ export async function createApp() {
   app.use("/auth", authRoutes);
   app.use("/leads", leadsRoutes);
   app.use("/tasks", tasksRoutes);
+  app.use("/utils", utilsRoutes);
 
   app.get("/health", (req, res) => res.json({ ok: true }));
   return app;

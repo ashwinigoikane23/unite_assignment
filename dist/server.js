@@ -5,14 +5,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const app_1 = require("./app");
+const express_1 = __importDefault(require("express"));
+const mongoose_1 = __importDefault(require("mongoose"));
+const body_parser_1 = __importDefault(require("body-parser"));
+const cors_1 = __importDefault(require("cors"));
+const auth_route_1 = __importDefault(require("./routes/auth.route"));
+const leads_route_1 = __importDefault(require("./routes/leads.route"));
+const tasks_route_1 = __importDefault(require("./routes/tasks.route"));
+const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
+const yamljs_1 = __importDefault(require("yamljs"));
+const path_1 = __importDefault(require("path"));
+const app = (0, express_1.default)();
+app.use((0, cors_1.default)());
+app.use(body_parser_1.default.json());
+const MONGO = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/unite";
+mongoose_1.default.connect(MONGO).then(() => console.log("Connected to Mongo")).catch(e => console.error(e));
+app.use("/auth", auth_route_1.default);
+app.use("/leads", leads_route_1.default);
+app.use("/tasks", tasks_route_1.default);
+const swaggerDoc = yamljs_1.default.load(path_1.default.join(__dirname, "../openapi.yaml"));
+app.use("/api-docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerDoc));
+app.get("/health", (req, res) => res.json({ ok: true }));
 const PORT = process.env.PORT || 4000;
-async function main() {
-    const app = await (0, app_1.createApp)();
-    app.listen(PORT, () => console.log(`Server listening ${PORT}`));
-}
-main().catch((err) => {
-    console.error(err);
-    process.exit(1);
-});
+app.listen(PORT, () => console.log("Server listening", PORT));
 //# sourceMappingURL=server.js.map

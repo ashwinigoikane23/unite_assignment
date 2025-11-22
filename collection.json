@@ -1,20 +1,16 @@
 {
   "info": {
-    "name": "Unite Backend API - Sample Collection",
-    "_postman_id": "unite-backend-sample-collection",
-    "description": "Collection to test auth, leads, and tasks endpoints for the Unite backend sample.",
+    "name": "Unite Backend - Complete Collection",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:4000",
-      "type": "string"
+      "value": "http://localhost:4000"
     },
     {
       "key": "token",
-      "value": "",
-      "type": "string"
+      "value": ""
     }
   ],
   "item": [
@@ -22,7 +18,7 @@
       "name": "Auth",
       "item": [
         {
-          "name": "Register (create user)",
+          "name": "Register",
           "request": {
             "method": "POST",
             "header": [
@@ -33,20 +29,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"testuser@example.com\",\n  \"password\": \"Password123!\",\n  \"role\": \"manager\"\n}"
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Password123!\",\n  \"role\": \"manager\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/auth/register",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "auth",
-                "register"
-              ]
+              "raw": "{{baseUrl}}/auth/register"
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Login",
@@ -60,20 +48,23 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"testuser@example.com\",\n  \"password\": \"Password123!\"\n}"
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"Password123!\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/auth/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "auth",
-                "login"
-              ]
+              "raw": "{{baseUrl}}/auth/login"
             }
           },
-          "response": []
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = pm.response.json(); if (j && j.token) pm.environment.set('token', j.token);"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -99,46 +90,9 @@
               "raw": "{\n  \"name\": \"Lead A\",\n  \"phone\": \"9999000001\",\n  \"email\": \"leadA@example.com\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/leads",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "leads"
-              ]
+              "raw": "{{baseUrl}}/leads"
             }
-          },
-          "response": []
-        },
-        {
-          "name": "Create Duplicate Lead (expect 409)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Lead A Duplicate\",\n  \"phone\": \"9999000001\",\n  \"email\": \"dup@example.com\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/leads",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "leads"
-              ]
-            }
-          },
-          "response": []
+          }
         },
         {
           "name": "List Leads",
@@ -151,19 +105,12 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/leads",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "leads"
-              ]
+              "raw": "{{baseUrl}}/leads"
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Get Lead by ID (replace :id)",
+          "name": "Get Lead",
           "request": {
             "method": "GET",
             "header": [
@@ -173,17 +120,47 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/leads/:id",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "leads",
-                ":id"
-              ]
+              "raw": "{{baseUrl}}/leads/:id"
             }
-          },
-          "response": []
+          }
+        },
+        {
+          "name": "Update Lead",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Updated Lead\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/leads/:id"
+            }
+          }
+        },
+        {
+          "name": "Delete Lead",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/leads/:id"
+            }
+          }
         }
       ]
     },
@@ -191,7 +168,7 @@
       "name": "Tasks",
       "item": [
         {
-          "name": "Create Call Task",
+          "name": "Create Task",
           "request": {
             "method": "POST",
             "header": [
@@ -206,22 +183,83 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"leadId\": \"<replace_with_lead_id>\",\n  \"assigned_to\": \"<replace_with_user_id>\",\n  \"scheduledAt\": \"2025-01-01T10:00:00Z\",\n  \"idempotencyKey\": \"task-1234\"\n}"
+              "raw": "{\n  \"leadId\": \"<lead_id>\",\n  \"assigned_to\": \"<user_id>\",\n  \"scheduledAt\": \"2025-01-01T10:00:00Z\",\n  \"idempotencyKey\": \"task-1\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/tasks",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "tasks"
-              ]
+              "raw": "{{baseUrl}}/tasks"
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Complete Call Task",
+          "name": "List Tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks"
+            }
+          }
+        },
+        {
+          "name": "Get Task",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/:id"
+            }
+          }
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"outcome\":\"updated\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks/:id"
+            }
+          }
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks/:id"
+            }
+          }
+        },
+        {
+          "name": "Complete Task",
           "request": {
             "method": "POST",
             "header": [
@@ -236,21 +274,26 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"outcome\": \"successful\",\n  \"note\": \"Called and interested\"\n}"
+              "raw": "{\"outcome\":\"successful\",\"note\":\"Called\"}"
             },
             "url": {
-              "raw": "{{baseUrl}}/tasks/:id/complete",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "tasks",
-                ":id",
-                "complete"
-              ]
+              "raw": "{{baseUrl}}/tasks/:id/complete"
             }
-          },
-          "response": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "AssignmentBrief",
+      "item": [
+        {
+          "name": "Open Assignment Brief",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "file:///mnt/data/Senior_Backend_Developer_Assignment_Unite.pdf"
+            }
+          }
         }
       ]
     }

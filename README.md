@@ -27,4 +27,9 @@ To run the test suite using the real MongoDB instance in docker-compose:
 Or run both build and test in one command:
    docker compose up --build --abort-on-container-exit test
 
-The test service runs `npm ci && npm test` and exits with the test result code.
+The test service runs `npm run build && npm run dev` and exits with the test result code.
+for frontend run `serve frontend` on another terminal
+
+NOTE:
+Use login id: test@example.com
+password: Password123!
