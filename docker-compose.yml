@@ -1,0 +1,66 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    command: npm run dev
+    ports:
+      - "4000:4000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/unite
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=dev_jwt_secret
+    depends_on:
+      - mongo
+      - redis
+
+  worker:
+    build: .
+    command: npm run worker
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/unite
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - mongo
+      - redis
+
+  seed:
+    build: .
+    command: node ./scripts/seed.js
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/unite
+    depends_on:
+      - mongo
+
+  test:
+    build: .
+    # Wait for mongo to be healthy before running tests
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/unite_test
+      - NODE_ENV=test
+    command: sh -c "npm ci && npm test"
+    # do not restart test container
+    restart: "no"
+
+  mongo:
+    image: mongo:6
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+volumes:
+  mongo-data:
